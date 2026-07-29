@@ -1,0 +1,31 @@
+name: Build Jetchat APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to create a release
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Build Jetchat Debug APK
+        run: ./gradlew :Jetchat:assembleDebug
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: Jetchat Sample Release
+          body: Auto-generated Jetchat Debug APK build.
+          files: Jetchat/app/build/outputs/apk/debug/*.apk
