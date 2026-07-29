@@ -1,13 +1,13 @@
 name: Build & Release All Sample APKs
 
 on:
-  workflow_dispatch: # Allows manual trigger via 'Run workflow' button
+  workflow_dispatch:
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Grants permission to create GitHub Releases
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -19,18 +19,36 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build All Sample APKs
-        # Compiles Jetchat, Jetnews, Jetsnack, Jetcaster, JetLagged, and Reply simultaneously
+      # Build each app using its own directory's gradlew file
+      - name: Build Jetchat
         run: |
-          ./gradlew :Jetchat:assembleDebug \
-                    :JetNews:assembleDebug \
-                    :Jetsnack:assembleDebug \
-                    :Jetcaster:assembleDebug \
-                    :JetLagged:assembleDebug \
-                    :Reply:assembleDebug
+          chmod +x Jetchat/gradlew
+          cd Jetchat && ./gradlew assembleDebug
+
+      - name: Build JetNews
+        run: |
+          chmod +x JetNews/gradlew
+          cd JetNews && ./gradlew assembleDebug
+
+      - name: Build Jetsnack
+        run: |
+          chmod +x Jetsnack/gradlew
+          cd Jetsnack && ./gradlew assembleDebug
+
+      - name: Build Jetcaster
+        run: |
+          chmod +x Jetcaster/gradlew
+          cd Jetcaster && ./gradlew assembleDebug
+
+      - name: Build JetLagged
+        run: |
+          chmod +x JetLagged/gradlew
+          cd JetLagged && ./gradlew assembleDebug
+
+      - name: Build Reply
+        run: |
+          chmod +x Reply/gradlew
+          cd Reply && ./gradlew assembleDebug
 
       - name: Publish All APKs to GitHub Releases
         uses: softprops/action-gh-release@v2
@@ -38,9 +56,9 @@ jobs:
           tag_name: all-samples-v1.0
           name: Compose Samples (All Apps)
           body: |
-            This release contains pre-built debug APKs for all Compose sample apps in this repository:
+            This release contains pre-built debug APKs for all Compose sample apps:
             - Jetchat
-            - Jetnews
+            - JetNews
             - Jetsnack
             - Jetcaster
             - JetLagged
